@@ -6,10 +6,10 @@ import static org.hamcrest.Matchers.is;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import org.openqa.selenium.By;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Parameters;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.ecom.BaseClass.TestBase;
@@ -20,12 +20,15 @@ public class AmazonTest extends TestBase {
 
 	AmazonHomepage amazon;
 	TestUtility testUtil;
+	Map<String, List<String>> testData;
+	List<String> scenarioData;
 
-	@Parameters({ "browser" })
-	@BeforeTest(alwaysRun = true)
-	public void setUp(String browser) {
-		System.out.println(System.getProperty("os.name"));
-		System.out.println(browser);
+	@BeforeClass(alwaysRun = true)
+	public void setUp() {
+		System.out.println(this.getClass().getSimpleName());
+		testUtil = new TestUtility();
+		testData = TestUtility.getTestData(this.getClass().getSimpleName());
+		System.out.println(testData);
 		initialization();
 		Log.info("Application Launched Successfully");
 
@@ -33,54 +36,104 @@ public class AmazonTest extends TestBase {
 		driver.get(property.getProperty("amznURL"));
 	}
 
-	@Test(priority = 1, enabled = false)
+	@Test(priority = 1, enabled = true)
 	public void validateURLNavigation(Method method) {
 		extentTest = extent.startTest(method.getName());
+		scenarioData = testData.get(method.getName());
+
 		String actualURL = driver.getCurrentUrl();
 		assertThat(actualURL, is(equalTo("https://www.amazon.in/")));
 	}
 
-	@Test(priority = 1, enabled = false)
+	@Test(priority = 2, enabled = true)
 	public void validateTitleNavigation(Method method) {
 		extentTest = extent.startTest(method.getName());
+		scenarioData = testData.get(method.getName());
+
 		String actualTitle = driver.getTitle();
-		assertThat(actualTitle, is(equalTo(
-				"Online Shopping site in India: Shop Online for Mobiles, Books, Watches, Shoes and More - Amazon.in")));
-	}
-
-	@Test(priority = 2, enabled = false)
-	public void validateCreateWishListNavigation(Method method) {
-		extentTest = extent.startTest(method.getName());
-		amazon.navigateToCreateWishlist();
-		String actualTitle = driver.getTitle();
-		assertThat(actualTitle, is(equalTo("Amazon.in")));
-	}
-
-	@Test(priority = 2, enabled = false)
-	public void validateSearchResult(Method method) throws InterruptedException {
-		extentTest = extent.startTest(method.getName());
-		amazon.searchAProduct("mi mobile");
-
-		amazon.selectFourRating();
-		amazon.clickOnFirstResult();
-		ArrayList<String> tabs = new ArrayList<String>(driver.getWindowHandles());
-		driver.switchTo().window(tabs.get(1));
-		System.out.println(amazon.getPrice());
+		assertThat(actualTitle, is(equalTo(scenarioData.get(0))));
 	}
 
 	@Test(priority = 3, enabled = true)
-	public void validateDeliveryPinSelected(Method method) {
+	public void validateCreateWishListNavigation(Method method) {
 		extentTest = extent.startTest(method.getName());
-		amazon.searchAProduct("mi mobile");
+		scenarioData = testData.get(method.getName());
+
+		amazon.navigateToCreateWishlist();
+		String actualTitle = driver.getTitle();
+		assertThat(actualTitle, is(equalTo(scenarioData.get(0))));
+	}
+
+	@Test(priority = 4, enabled = true)
+	public void validateSearchResult(Method method) throws InterruptedException {
+		extentTest = extent.startTest(method.getName());
+		scenarioData = testData.get(method.getName());
+
+		amazon.searchAProduct(scenarioData.get(0));
+
+		String actualTitle = driver.getTitle();
+		assertThat(actualTitle, is(equalTo("Amazon.in : mi mobile")));
+	}
+
+	@Test(priority = 5, enabled = true)
+	public void validateUserIsAbleToSelectfourStarRating(Method method) {
+		extentTest = extent.startTest(method.getName());
+		scenarioData = testData.get(method.getName());
 
 		amazon.selectFourRating();
+
+		String actualTitle = driver.getTitle();
+		assertThat(actualTitle, is(equalTo("Amazon.in: mi mobile - 4 Stars & Up")));
+	}
+
+	@Test(priority = 6, enabled = true)
+	public void validateUserIsAbleToClickOnFristProduct(Method method) {
+		extentTest = extent.startTest(method.getName());
+		scenarioData = testData.get(method.getName());
+
 		amazon.clickOnFirstResult();
 		ArrayList<String> tabs = new ArrayList<String>(driver.getWindowHandles());
 		driver.switchTo().window(tabs.get(1));
-		amazon.enterPIN("412101");
 
-		System.out.println("Delivery location is -> " + driver
-				.findElement(By.xpath("//div[@id='contextualIngressPtLabel_deliveryShortLine']/span[2]")).getText());
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		String actualTitle = driver.getTitle();
+		assertThat("title was not correct", actualTitle.contains(scenarioData.get(0)));
 	}
 
+	@Test(priority = 7, enabled = true)
+	public void validateDealPriceDisplayed(Method method) {
+
+		extentTest = extent.startTest(method.getName());
+		scenarioData = testData.get(method.getName());
+
+		assertThat("deal price not displayed", amazon.isDealPriceDisplayed());
+	}
+
+	@Test(priority = 8, enabled = true)
+	public void validateMRPDisplayed(Method method) {
+		extentTest = extent.startTest(method.getName());
+
+		assertThat("deal price not displayed", amazon.isDealPriceDisplayed());
+	}
+
+	@Test(priority = 9, enabled = true)
+	public void validateDeliveryDateDisplayed(Method method) {
+		extentTest = extent.startTest(method.getName());
+		scenarioData = testData.get(method.getName());
+
+		assertThat("deal price not displayed", amazon.isDeliveryDateDisplayed());
+	}
+
+	@Test(priority = 10, enabled = true)
+	public void validateDeliveryPinSelected(Method method) {
+		extentTest = extent.startTest(method.getName());
+		scenarioData = testData.get(method.getName());
+
+
+		assertThat("deal price not displayed", amazon.isPINTextBox());
+	}
 }

@@ -34,7 +34,7 @@ public class TestBase {
 	public static Properties property;
 	public static ChromeOptions chromeOptions;
 	public static EventFiringWebDriver e_driver;
-	public static WebEventListener eventListener;
+//	public static WebEventListener eventListener;
 	public static Logger Log;
 	public static ExtentReports extent;
 	public static ExtentTest extentTest;
@@ -93,8 +93,8 @@ public class TestBase {
 
 		e_driver = new EventFiringWebDriver(driver);
 
-		eventListener = new WebEventListener();
-		e_driver.register(eventListener);
+//		eventListener = new WebEventListener();
+//		e_driver.register(eventListener);
 		driver = e_driver;
 
 		driver.manage().window().maximize();

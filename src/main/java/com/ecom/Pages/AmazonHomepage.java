@@ -30,16 +30,27 @@ public class AmazonHomepage extends TestBase {
 	@FindBy(xpath = "//div[@class='s-main-slot s-result-list s-search-results sg-row']/div[2]//a[1]")
 	WebElement firstSerachResult;
 
-	
 	@FindBy(id = "priceblock_ourprice")
 	WebElement priceBox;
-	
+
 	@FindBy(xpath = "//div[@id='buyBoxAccordion']//div[@id='glowContextualIngressPt_feature_div']//a")
 	WebElement selectLocationLink;
-	
+
 	@FindBy(id = "GLUXZipUpdateInput")
 	WebElement enterPinBox;
-	
+
+	@FindBy(id = "priceblock_dealprice")
+	WebElement dealPrice;
+
+	@FindBy(id = "listPriceLegalMessage")
+	WebElement mrpPrice;
+
+	@FindBy(id = "ddmDeliveryMessage")
+	WebElement deliveryMsg;
+
+	@FindBy(id = "contextualIngressPtLabel_deliveryShortLine")
+	WebElement deliveryLocation;
+
 	public AmazonHomepage() {
 		PageFactory.initElements(driver, this);
 	}
@@ -57,6 +68,21 @@ public class AmazonHomepage extends TestBase {
 		CreteWishList.click();
 	}
 
+	public boolean isDealPriceDisplayed() {
+		new WebDriverWait(driver, 15).until(ExpectedConditions.elementToBeClickable(dealPrice));
+		return dealPrice.isDisplayed();
+	}
+
+	public boolean isMRPPriceDisplayed() {
+		new WebDriverWait(driver, 15).until(ExpectedConditions.elementToBeClickable(mrpPrice));
+		return mrpPrice.isDisplayed();
+	}
+
+	public boolean isDeliveryDateDisplayed() {
+		new WebDriverWait(driver, 15).until(ExpectedConditions.elementToBeClickable(deliveryMsg));
+		return deliveryMsg.isDisplayed();
+	}
+
 	public void searchAProduct(String searchString) {
 		searchBox.sendKeys(searchString);
 		searchBox.sendKeys(Keys.ENTER);
@@ -66,11 +92,17 @@ public class AmazonHomepage extends TestBase {
 		new WebDriverWait(driver, 15).until(ExpectedConditions.visibilityOf(serachResultCount));
 		return serachResultCount.getText();
 	}
-	
+
 	public void selectFourRating() {
 		fourStarAndUp.click();
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
-	
+
 	public void clickOnFirstResult() {
 		firstSerachResult.click();
 	}
@@ -78,12 +110,17 @@ public class AmazonHomepage extends TestBase {
 	public String getPrice() {
 		return priceBox.getText();
 	}
-	
-	public void enterPIN(String Pin) {
+
+	public boolean isPINTextBox() {
 		new WebDriverWait(driver, 15).until(ExpectedConditions.elementToBeClickable(selectLocationLink));
 		selectLocationLink.click();
 		new WebDriverWait(driver, 15).until(ExpectedConditions.visibilityOf(enterPinBox));
-		enterPinBox.sendKeys(Pin+Keys.ENTER);
+		return enterPinBox.isEnabled();
+	}
+
+	public boolean getDeliveryLocation() {
+//		new WebDriverWait(driver, 15).until(ExpectedConditions.visibilityOf(deliveryLocation));
+		return deliveryLocation.isDisplayed();
 	}
 
 }

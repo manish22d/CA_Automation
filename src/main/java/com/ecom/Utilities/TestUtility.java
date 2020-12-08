@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -44,7 +45,7 @@ public class TestUtility extends TestBase {
 
 	// DataProvider Utility is used for getting Data from Excel ==>> Should be used
 	// with @DataProvider.
-	public static String[][] getTestData(String sheetName) {
+	public static HashMap<String, List<String>> getTestData(String sheetName) {
 		FileInputStream file = null;
 		try {
 			file = new FileInputStream(Constants.TEST_DATA_SHEET_PATH);
@@ -58,11 +59,15 @@ public class TestUtility extends TestBase {
 		}
 
 		sheet = book.getSheet(sheetName);
-		String[][] data = new String[sheet.getLastRowNum()][sheet.getRow(0).getLastCellNum()];
+		HashMap<String, List<String>> data = new HashMap<String, List<String>>();
+
 		for (int i = 0; i < sheet.getLastRowNum(); i++) {
-			for (int k = 0; k < sheet.getRow(0).getLastCellNum(); k++) {
-				data[i][k] = sheet.getRow(i + 1).getCell(k).toString();
+			List<String> testData = new ArrayList<String>();
+			for (int k = 1; k < sheet.getRow(0).getLastCellNum(); k++) {
+				if (sheet.getRow(0).getCell(k).toString().startsWith("testData"))
+					testData.add(sheet.getRow(i + 1).getCell(k).toString());
 			}
+			data.put(sheet.getRow(i + 1).getCell(1).toString(), testData);
 		}
 		return data;
 	}
